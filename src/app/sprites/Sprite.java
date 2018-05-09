@@ -23,6 +23,8 @@ public  class Sprite {
 
     protected double x;                            //The x position of the sprite
     protected double y;                            //The y position of the sprite
+    private double initialX;
+    private double initialY;
 
     private ArrayList<Animation> animation;      //A list containing all the animation each action has
 
@@ -80,6 +82,8 @@ public  class Sprite {
       imgFilesPath = null;
       this.x = x;
       this.y = y;
+      initialX = x;
+      initialY = y;
 
       this.vxi = vxi;
       this.vyi = vyi;
@@ -610,5 +614,10 @@ public  class Sprite {
 
     public boolean overlap(Rectangle rect2){
         return rectangle.overlaps(rect2);
+    }
+
+    public void resetPosition(){
+        x = initialX;
+        y = initialY;
     }
 }

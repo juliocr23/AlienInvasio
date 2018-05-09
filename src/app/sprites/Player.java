@@ -1,7 +1,15 @@
 package app.sprites;
+
+
+/**
+ * Important NOTE: You don't need booleans, you can do if(activity == Activity.Run) etc.
+ * Last update was making the plaer go dizzy when is hit by an enemy.
+ */
+
+
+
 import app.main.Framework;
 import app.others.Sound;
-
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -33,6 +41,7 @@ public class Player extends Sprite {
     private boolean runWithGun;
     private boolean isMovingRight;
     private boolean isShooting;
+    private boolean isDizzy;
 
     private Image img;                //The image to be drawn
     private double lastY;             //Last recorded y value
@@ -141,10 +150,9 @@ public class Player extends Sprite {
        moveRightUpdate();
        moveLeftUpdate();
 
-        if(playerOffScreen() || World.isCollidingWithEnemy()){
-            health -= 33;
-        }
-
+        //if(playerOffScreen() || World.isCollidingWithEnemy()){
+        //    health -= 33;
+       // }
        updateActivity();
        updateBullets();
        updateImg();
@@ -173,6 +181,7 @@ public class Player extends Sprite {
 
         standStill();       //Stand still if it is not moving
 
+       // if(isDizzy)
         run();             //Run to the left or right if they were pressed
 
         shoot();           //Shoot enemies if A button was pressed
@@ -318,7 +327,7 @@ public class Player extends Sprite {
     }
 
     public boolean isMoving(){
-        return shot || moveUp || moveL || moveR || isShooting;
+        return shot || moveUp || moveL || moveR || isShooting  || isDizzy;
     }
 
     public boolean playerOffScreen(){
@@ -348,7 +357,7 @@ public class Player extends Sprite {
     }
 
     public void setHealth(int h){
-        health -= h;
+        health += h;
     }
 
     private void drawUI(Graphics g){
@@ -450,11 +459,14 @@ public class Player extends Sprite {
         if(animationOver(activity.getValue())) {
             reset(activity.getValue());
             isShooting = false;
+            isDizzy = false;
         }
     }
 
+
     public void setToDizzy(){
         activity = Activity.DIZZY;
+        isDizzy = true;
     }
 
     public void setToDie(){

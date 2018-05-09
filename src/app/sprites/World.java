@@ -17,16 +17,26 @@ public class World {
 
     private static Object[][] object;                 //objects in the map
     private static int tileSize = 64;                 //The size of the tile
+
     private static Player player;                     //The player in the map
+
     private static double x;                          //The x offset of the map
     private static double y;                          //The y offset of the map
+
     private Background BG;                            //The background of the game
     private Sound backgroundSound;                    //Sound for the background
+
+    private int timer = 200;                         //Timer for player to complete map
+    private volatile double delta = 0;               //Delta used to calculate timer
+
+    private Image clockUI1;                          //Clock UI component for the game
+    private Image clockUI2;                          //Clock UI component for the game
 
     public World(){
         x = 0;
         y = 0;
         tileSize = 64;
+        loadClock();
     }
 
     public void moveLeftBy(double dx){
@@ -37,42 +47,18 @@ public class World {
     }
 
 
+//-----------------------------------------------------UPDATES---------------------------------------------------------------\\
     public void update(){
 
-        for(int i = 0; i< object.length; i++) {
-            for (int j = 0; j< object[0].length; j++) {
-                if(object[i][j] != null) {
-                    updateCoin(i,j);
-                    updateEnemy(i,j,getDrawX(j),getDrawY(i));
-                }
-            }
-        }
+        updateTimer();
 
-        if(player.isMoveR() &&
-           !player.isEndOfWorld()){
+        updateEnemyCollision();
 
-            if(player.isInMiddleOfScreen() &&
-              !player.isFacingRightTile()) {
+        updateCoinAndEnemy();
 
-                BG.moveLeftBy((int) player.getVx());
-                moveLeftBy(player.getVx());
-            }
-        }
+        updateWorldMovingRight();
 
-        if(player.isMoveL()){
-
-            if(player.isInMiddleOfScreen() &&
-              !player.isFacingLeftTile() &&
-               player.isStart()) {
-
-                BG.moveRightBy((int) player.getVx());
-                moveRightBy(player.getVx());
-            }
-            else if(!player.isStart()){
-                setX(0);
-                BG.reset();
-            }
-        }
+        updateWorldMovingLeft();
     }
 
     private void updateCoin(int x, int y){
@@ -108,10 +94,79 @@ public class World {
         }
     }
 
+    private void updateEnemyCollision(){
+
+        if(isCollidingWithEnemy()){
+
+            player.setHealth(-33);    //Take one third of player's life point
+            player.setToDizzy();      //Make the player go dizzy because it has been hit by an enemy
+            player.resetPosition();   //Reset the player to the beginning of the game
+
+            resetMap();               //Reset the map to the beginning
+            BG.reset();              //Reset the background to the beginning
+        }
+    }
+
+    private void updateWorldMovingLeft(){
+
+        if(player.isMoveR() && !player.isEndOfWorld()){
+
+            if(player.isInMiddleOfScreen() &&
+                    !player.isFacingRightTile()) {
+
+                BG.moveLeftBy((int) player.getVx());
+                moveLeftBy(player.getVx());
+            }
+        }
+    }
+
+    private void updateWorldMovingRight(){
+
+        if(player.isMoveL()){
+
+            if(player.isInMiddleOfScreen() &&
+              !player.isFacingLeftTile()   && player.isStart()) {
+
+                BG.moveRightBy((int) player.getVx());
+                moveRightBy(player.getVx());
+
+            }
+            else if(!player.isStart()){
+                setX(0);
+                BG.reset();
+            }
+        }
+    }
+
+    private void updateCoinAndEnemy(){
+
+        for(int i = 0; i< object.length; i++) {
+            for (int j = 0; j< object[0].length; j++) {
+
+                if(object[i][j] != null) {
+                    updateCoin(i,j);
+                    updateEnemy(i,j,getDrawX(j),getDrawY(i));
+                }
+            }
+        }
+    }
+
+    private void updateTimer(){
+        delta += 0.02;
+        if(delta >= 1){
+            delta = 0;
+            timer--;
+        }
+    }
+
+//-----------------------------------------------------RENDERING------------------------------------------------------------\\
     public void draw(Graphics g){
 
         //Draw background
         BG.draw(g);
+
+        //Draw clock
+        drawClock(g);
 
         int startX =  getStartX();
         int endX   =  getEndX();
@@ -185,11 +240,31 @@ public class World {
         }
     }
 
+    private void drawClock(Graphics g){
 
+        Graphics2D g2 = (Graphics2D) g;
+
+        //Use anti-aliasing to make the text look sharper
+        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+        //Set the font and color
+        g2.setFont(new Font(Font.SANS_SERIF,Font.BOLD,16));
+        g2.setColor(Color.WHITE);
+
+        //Draw timer UI
+        g2.drawImage(clockUI1,450,0,140,38,null);
+        g2.drawImage(clockUI2,460,7,35,25,null);
+        g2.drawString(""+timer,520,25);
+    }
+
+//----------------------------------------------COLLISION-----------------------------------------------------------------\\
 
     public static boolean isSolidTile(int x, int y){
+
         boolean flag = false;
         if((x >= 0 && x< object[0].length) && (y>=0 && y< object.length) ) {
+
             if (object[y][x] != null && object[y][x] instanceof Image)
                  flag = true;
         }
@@ -197,8 +272,10 @@ public class World {
     }
 
     public static boolean isSolidCoin(int x, int y){
+
         boolean flag = false;
         if((x >= 0 && x< object[0].length) && (y>=0 && y< object.length) ) {
+
             if (object[y][x] != null && object[y][x] instanceof Coin)
                 flag = true;
         }
@@ -206,8 +283,10 @@ public class World {
     }
 
     public static boolean isSolidBullet(int x, int y){
+
         boolean flag = false;
         if((x >= 0 && x< object[0].length) && (y>=0 && y< object.length) ) {
+
             if (object[y][x] != null && object[y][x] instanceof DroppedItem)
                 flag = true;
         }
@@ -215,7 +294,9 @@ public class World {
     }
 
     public static void removeBullet(int x, int y){
+
         if((x >= 0 && x< object[0].length) && (y>=0 && y< object.length) ) {
+
             if (object[y][x] != null && object[y][x] instanceof DroppedItem)
                 object[y][x] = null;
         }
@@ -225,12 +306,17 @@ public class World {
     public static boolean isCollidingWithEnemy(){
 
         boolean flag = false;
+
         for(int i = 0; i< object.length; i++){
+
             for(int j = 0; j< object[0].length; j++){
+
                    if(object[i][j] != null){
 
                        if(object[i][j] instanceof  Alien){
+
                            Alien alien = (Alien) object[i][j];
+
                            if(alien.overlap(player.getRectangle())){
                                flag = true;
                                break;
@@ -242,37 +328,6 @@ public class World {
         return flag;
     }
 
-    public static boolean isHittingEnemy(){
-
-        boolean flag = false;
-
-        for(int i = 0; i< object.length; i++){
-
-            for(int j = 0; j< object[0].length; j++){
-
-                if(object[i][j] != null){
-
-                    if(object[i][j] instanceof  Alien){
-                        Alien alien = (Alien) object[i][j];
-                        Bullet[] bullet = player.getBullet();
-
-                        for(int k = 0; k<bullet.length; k++){
-
-                            if(bullet[k] != null) {
-                                if (alien.overlap(bullet[k])) {
-                                    flag = true;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return flag;
-    }
-
-
     public static void removeCoin(int x, int y){
         if((x >= 0 && x< object[0].length) && (y>=0 && y< object.length) ) {
             if (object[y][x] != null && object[y][x] instanceof Coin)
@@ -280,22 +335,8 @@ public class World {
         }
     }
 
-    public static double getX(){
-        return x;
-    }
 
-    public void setX(double x){
-        this.x = x;
-    }
-
-    public static double getY(){
-        return y;
-    }
-
-    public static int getTileSize(){
-        return tileSize;
-    }
-
+//---------------------------------------------------------------Parse Text File------------------------------------------------------\\
 
     /**
      * The getContext method read a file line by line ignoring #
@@ -349,18 +390,18 @@ public class World {
         int width = getLongestLine(code);
         int height = code.size();
 
-        object = new Object[height][width];  //Create a grid to represent the world
+        object = new Object[height][width];                //Create a grid to represent the world
 
-        String line;                      //A line of code
-        char  tile;                       //A tile
+        String line;                                       //A line of code
+        char  tile;                                        //A tile
 
         for(int i = 0; i<height; i++) {
 
-            line = code.get(i);   //Get a line of code
+            line = code.get(i);                            //Get a line of code
 
             for (int j = 0; j < line.length(); j++) {
 
-                tile = line.charAt(j); //Get a tile from the code
+                tile = line.charAt(j);                     //Get a tile from the code
 
                 //If the char is A-Z then is a tile.
                 if (Character.isAlphabetic(tile) && Character.isUpperCase(tile)) {
@@ -379,6 +420,7 @@ public class World {
                     object[i][j] = new Coin();
                 }
 
+                //Store Dropped Items
                 if(tile == '*'){
                     object[i][j] = new DroppedItem();
                 }
@@ -394,6 +436,8 @@ public class World {
             }
         }
     }
+
+//---------------------------------------------------Getters and Setters-----------------------------------------------------------\\
 
     public static int getWorldMaxY(){
         return object.length;
@@ -449,4 +493,42 @@ public class World {
         backgroundSound.setVolume(-20.0f);
         backgroundSound.loop();
     }
+
+    public void setTimer(int time){
+        timer = time;
+    }
+
+
+    public static double getX(){
+        return x;
+    }
+
+    public void setX(double x){
+        this.x = x;
+    }
+
+    public static double getY(){
+        return y;
+    }
+
+    public static int getTileSize(){
+        return tileSize;
+    }
+
+    //----------------------------------------------------------Others--------------------------------------------------------------------------//
+
+    private void loadClock(){
+        try {
+            clockUI1 = ImageIO.read(new File("Resources/GUI/clockUI1.png"));
+            clockUI2 = ImageIO.read(new File("Resources/GUI/clockUI2.png"));
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void resetMap(){
+        x = 0;
+        y = 0;
+    }
+
 }
