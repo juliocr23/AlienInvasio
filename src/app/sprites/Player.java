@@ -188,7 +188,7 @@ public class Player extends Sprite {
 
         jump();            //Jump if the up button was pressed
 
-        reset();          //Reset the animation if animation is over
+        resetAnimation();          //Reset the animation if animation is over
     }
 
     public void moveRight() {
@@ -330,7 +330,7 @@ public class Player extends Sprite {
         return shot || moveUp || moveL || moveR || isShooting  || isDizzy;
     }
 
-    public boolean playerOffScreen(){
+    public boolean offScreen(){
         return y >= Framework.height;
     }
 
@@ -454,7 +454,7 @@ public class Player extends Sprite {
             activity = Activity.JUMP;
     }
 
-    public void reset(){
+    public void resetAnimation(){
 
         if(animationOver(activity.getValue())) {
             reset(activity.getValue());
@@ -471,5 +471,17 @@ public class Player extends Sprite {
 
     public void setToDie(){
         activity = Activity.DEAD;
+    }
+
+    public void reset(){
+        x = initialX;
+        y = initialY;
+
+        rectangle.x = x+10;
+        rectangle. y = y+50;
+
+        score = 0;
+        ammunition = 95;
+        counter = -1;
     }
 }

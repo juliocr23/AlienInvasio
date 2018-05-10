@@ -1,6 +1,7 @@
 /**
- * NOTE: If the aliens aren't dead I want the aliens to follow the player.
- * Therefore the drawing of the alien is independent of the tile map.
+ * Fix health bar, make the boss smart.
+ * Create gameOver state.
+ * Once the player defeat the boss, display Some GUI with congratulation and stuff.
  */
 
 package app.sprites;
@@ -12,7 +13,8 @@ public class Alien extends Sprite {
 
     private enum Activity{
         RUN(0),
-        EXPLOSION(1);
+        EXPLOSION(1),
+        FIRE(2);
         private final int num;
         Activity(int num) {
             this.num = num;
@@ -25,14 +27,16 @@ public class Alien extends Sprite {
     private Activity activity;
     private boolean isMovingRight;
     private Image img;
+    private int numberOfHits;      //The number of times the alien need to be hit for exploding
+    private int hitCounter;        //Record the number of time the alien has been hit
 
-    public Alien(double x, double y,int w, int h,String file){
+    public Alien(double x, double y,int w, int h,String file,double scale){
         super(x,y,w,h);
 
         addAction("run");
         addAction("explosion");
 
-        addDuration(5);      //Duration for Run
+        addDuration(10);      //Duration for Run
         addDuration(5);      //Duration for explosion
 
         addLength(6);       //Length of images for run
@@ -49,12 +53,14 @@ public class Alien extends Sprite {
         rectangle.height = rectangle.height-55;
         rectangle.width = rectangle.width-40;
         moveR = true;
+        scaleBy = scale;
+        numberOfHits = 1;
+        hitCounter = 0;
     }
 
     public void update(int dx, int dy){
       super.update();
 
-        //Reset animation if it is over for that activity
         if(animationOver(activity.getValue())) {
             reset(activity.getValue());
         }
@@ -116,8 +122,8 @@ public class Alien extends Sprite {
     public void updateImage(){
 
         img = getNextImg(activity.getValue());
-        height = (int)(img.getHeight(null)*0.2);
-        width =  (int)(img.getWidth(null)*0.2);
+        height = (int)(img.getHeight(null)*scaleBy);
+        width =  (int)(img.getWidth(null)*scaleBy);
 
         if(!isMovingRight){ //Create a new image and flipped horizontally and
                             //swap pointers with img
@@ -148,7 +154,11 @@ public class Alien extends Sprite {
     }
 
     public void setToDead(){
-        activity = Activity.EXPLOSION;
+            activity = Activity.EXPLOSION;
+    }
+
+    public void setToHit(){
+        hitCounter++;
     }
 
     public boolean isDead(){
@@ -160,5 +170,22 @@ public class Alien extends Sprite {
         moveR = false;
         moveL = false;
     }
+
+    public void setNumberOfHits(int hits){
+        numberOfHits = hits;
+    }
+
+    public boolean isExploading(){
+        return activity == Activity.EXPLOSION;
+    }
+
+    public int getHitCounter(){
+        return hitCounter;
+    }
+
+    public int getNumberOfHits(){
+        return numberOfHits;
+    }
+
 
 }

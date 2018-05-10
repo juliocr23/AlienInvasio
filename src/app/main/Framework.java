@@ -2,6 +2,10 @@
 package app.main;
 
 import app.input.KeyboardInput;
+import app.state.GameOver;
+import app.state.GameState;
+import app.state.MenuState;
+import app.state.State;
 
 import javax.swing.*;
 import java.awt.*;
@@ -49,9 +53,9 @@ public class Framework extends JFrame implements Runnable {
     private DisplayMode currentDisplayMode;
     private Canvas  canvas;
 
-    private State gameState;                    //The state of the game
-    private State gameOverState;
-    private State menuState;                   //The menu of the game
+    public static State gameState;                    //The state of the game
+    public static State gameOverState;
+    public static State menuState;                   //The menu of the game
 
 
     public void start(){
@@ -117,14 +121,13 @@ public class Framework extends JFrame implements Runnable {
     //Process user input from keyboard
     protected void processInput() {
         keyboard.poll();
-        ((GameState)gameState).getInput();
+        State.getState().processInput();
     }
 
     //update objects
     protected void updateObject() {
         if(State.getState() != null){
             State.getState().update();
-
         }
     }
 

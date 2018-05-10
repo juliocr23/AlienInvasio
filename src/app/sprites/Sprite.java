@@ -23,8 +23,8 @@ public  class Sprite {
 
     protected double x;                            //The x position of the sprite
     protected double y;                            //The y position of the sprite
-    private double initialX;
-    private double initialY;
+    protected double initialX;
+    protected double initialY;
 
     private ArrayList<Animation> animation;      //A list containing all the animation each action has
 
@@ -180,7 +180,7 @@ public  class Sprite {
         isTouchingRoof    = isTileAbove();
         isInTheMiddle     = isInTheMiddle();
 
-        if(!isMoving())                //If is not doing anything reset velocity
+        if(!isMoving())                //If is not doing anything resetAnimation velocity
             vxi = prevVxi;
 
         if(isRunning()) {             //If is running increase velocity in the x direction
@@ -619,5 +619,7 @@ public  class Sprite {
     public void resetPosition(){
         x = initialX;
         y = initialY;
+        rectangle.x = x;
+        rectangle. y = y;
     }
 }

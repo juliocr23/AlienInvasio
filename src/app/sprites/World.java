@@ -1,3 +1,4 @@
+
 package app.sprites;
 
 import app.animation.Background;
@@ -5,6 +6,8 @@ import app.animation.Coin;
 import app.main.Framework;
 import app.others.DroppedItem;
 import app.others.Sound;
+import app.state.GameOver;
+import app.state.State;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -16,7 +19,11 @@ import java.util.Scanner;
 public class World {
 
     private static Object[][] object;                 //objects in the map
+
     private static int tileSize = 64;                 //The size of the tile
+
+    private String mapTextFile;
+    private String mapImageFile;
 
     private static Player player;                     //The player in the map
 
@@ -32,9 +39,15 @@ public class World {
     private Image clockUI1;                          //Clock UI component for the game
     private Image clockUI2;                          //Clock UI component for the game
 
-    public World(){
+    public World(String map,String img){
+
+        mapTextFile = map;
+        mapImageFile = img;
+        loadTiles(map,img);
+
         x = 0;
         y = 0;
+
         tileSize = 64;
         loadClock();
     }
@@ -49,6 +62,18 @@ public class World {
 
 //-----------------------------------------------------UPDATES---------------------------------------------------------------\\
     public void update(){
+
+        if(player.offScreen()){
+            player.setHealth(-33);
+            player.reset();
+
+            resetMap();
+            BG.reset();
+        }
+
+        if(player.getHealth() == 1){
+           State.setState(Framework.gameOverState);
+        }
 
         updateTimer();
 
@@ -79,8 +104,12 @@ public class World {
 
             if(c >= 0 && bullet[c] != null){
                 if(alien.overlap(bullet[c])) {
-                    alien.dontMove();
-                    alien.setToDead();
+
+                    alien.setToHit();
+                    if(alien.getHitCounter() == alien.getNumberOfHits()) {
+                        alien.dontMove();
+                        alien.setToDead();
+                    }
 
                     bullet[c].x = -1000;
                     bullet[c].y = -1000;
@@ -98,12 +127,12 @@ public class World {
 
         if(isCollidingWithEnemy()){
 
-            player.setHealth(-33);    //Take one third of player's life point
-            player.setToDizzy();      //Make the player go dizzy because it has been hit by an enemy
-            player.resetPosition();   //Reset the player to the beginning of the game
+            player.setHealth(-33);
+            player.setToDizzy();
+            player.resetPosition();
 
-            resetMap();               //Reset the map to the beginning
-            BG.reset();              //Reset the background to the beginning
+            resetMap();
+            BG.reset();
         }
     }
 
@@ -156,6 +185,10 @@ public class World {
         if(delta >= 1){
             delta = 0;
             timer--;
+        }
+
+        if(timer == 0){
+           player = null;
         }
     }
 
@@ -317,7 +350,7 @@ public class World {
 
                            Alien alien = (Alien) object[i][j];
 
-                           if(alien.overlap(player.getRectangle())){
+                           if(alien.overlap(player.getRectangle()) && !alien.isExploading()){
                                flag = true;
                                break;
                            }
@@ -427,11 +460,17 @@ public class World {
 
                 //Store enemies
                 if(tile == '1'){
-                    object[i][j] = new Alien(0,0,64,100,"Resources/Enemies/BlueAlien/");
+                    object[i][j] = new Alien(0,0,64,100,"Resources/Enemies/BlueAlien/",0.2);
                 }
 
                 if(tile == '2'){
-                    object[i][j] = new Alien(0,0,64,100,"Resources/Enemies/GreenAlien/");
+                    object[i][j] = new Alien(0,0,64,100,"Resources/Enemies/GreenAlien/",0.2);
+                }
+
+                if(tile == '3'){
+                    Alien alien = new Alien(0,0,64,100,"Resources/Enemies/predatorMask/",0.3);
+                    alien.setNumberOfHits(3);
+                    object[i][j] = alien;
                 }
             }
         }
@@ -529,6 +568,6 @@ public class World {
     private void resetMap(){
         x = 0;
         y = 0;
+        loadTiles(mapTextFile,mapImageFile);
     }
-
 }

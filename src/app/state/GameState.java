@@ -1,22 +1,20 @@
 /*
      TODO Create aliens enemies, flies and Boss
      TODO If player falls he lose one third of his health, once it reach zero is game over.
-     TODO when the player falls reset everything.
+     TODO when the player falls resetAnimation everything.
      TODO when the bullet hits the enemy, the bullet will disappear and an explosition animation should appear
-     TODO when the player collides with the enemy the game is reset.
+     TODO when the player collides with the enemy the game is resetAnimation.
 
      Priority:
      Make the enemy walk forward and turn left if it
      is colliding with a tile or it is at the edge of
      the tile is walking on.
  */
-package app.main;
+package app.state;
 import app.sprites.Player;
 import app.sprites.World;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.io.File;
 
 public class GameState extends State {
 
@@ -48,9 +46,8 @@ public class GameState extends State {
         player.setVyf(playerVyf);
 
         //Tile map
-        map = new World();
+        map = new World(mapTxt,mapImgs);
         map.setPlayer(player);
-        map.loadTiles(mapTxt,mapImgs);
         map.setBackGround(BGFile,BGLength,"Resources/Sound/environment.wav");
     }
 
@@ -77,12 +74,17 @@ public class GameState extends State {
     }
 
     @Override
+    public void processInput() {
+        player.getInput();
+    }
+
+    @Override
     public void draw(Graphics g) {
         map.draw(g);
         player.draw(g);
     }
 
-    public void getInput(){
-        player.getInput();
-    }
+   // public void getInput(){
+     //   player.getInput();
+   // }
 }

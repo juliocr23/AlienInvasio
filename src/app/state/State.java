@@ -1,4 +1,4 @@
-package app.main;
+package app.state;
 
 import java.awt.*;
 
@@ -16,6 +16,8 @@ public abstract class State {
 
     //CLASS
     public abstract void update();
+
+    public abstract void processInput();
 
     public abstract void draw(Graphics g);
 }
