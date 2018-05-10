@@ -10,8 +10,6 @@ import java.io.File;
 
 public class GameOver extends State {
 
-    private boolean isQuit;
-    private boolean isRetry;
     private BufferedImage background;
     private BufferedImage buttonN;
     private BufferedImage buttonH;
@@ -101,11 +99,4 @@ public class GameOver extends State {
         g.drawString("Quit",(Framework.width/2)-20,Framework.height/2+5);
     }
 
-    public boolean isQuit() {
-        return isQuit;
-    }
-
-    public boolean isRetry() {
-        return isRetry;
-    }
 }

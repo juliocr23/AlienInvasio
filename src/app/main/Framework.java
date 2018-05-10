@@ -67,7 +67,7 @@ public class Framework extends JFrame implements Runnable {
         gameState = new GameState();
         menuState = new MenuState();
         gameOverState = new GameOver();
-        State.setState(gameState);
+        State.setState(menuState);
 
         //Create a size window
         createSizeWindow();
