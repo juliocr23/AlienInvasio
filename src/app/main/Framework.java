@@ -42,7 +42,7 @@ public class Framework extends JFrame implements Runnable {
     public static int height;                   //Screen height
 
     protected String title = "";                //Title of Game
-    protected Color background = Color.BLACK;   //Background
+    protected Color background = new Color(42,106,255);   //Background
 
     private static volatile boolean running;    //Use for the game loop
     private static Thread gameThread;           //The thread the game is running on
