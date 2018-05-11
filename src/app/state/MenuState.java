@@ -4,6 +4,7 @@ import app.main.Framework;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
@@ -12,6 +13,8 @@ public class MenuState extends State {
     private BufferedImage buttonH;
     private BufferedImage buttonN;
     private BufferedImage background;
+    private int counter = 0;
+    private boolean enter = false;
 
     public MenuState(){
         try{
@@ -26,11 +29,29 @@ public class MenuState extends State {
     @Override
     public void update() {
 
+        if(enter) {
+            if (counter == 0)
+                State.setState(Framework.gameState);
+
+            if (counter == 1)
+                State.setState(Framework.aboutState);
+
+            if (counter == 2)
+                System.exit(0);
+        }
     }
 
     @Override
     public void processInput() {
+        boolean up    = Framework.keyboard.keyDownOnce(KeyEvent.VK_UP);
+        boolean down  = Framework.keyboard.keyDownOnce(KeyEvent.VK_DOWN);
+                enter = Framework.keyboard.keyDownOnce(KeyEvent.VK_ENTER);
 
+        if(down && counter <2)
+            counter++;
+
+        if(up && counter>0)
+            counter --;
     }
 
     @Override
@@ -44,8 +65,9 @@ public class MenuState extends State {
 
         //Set the font and color
         g2.setFont(new Font(Font.SANS_SERIF,Font.BOLD,28));
-
         drawBG(g2);
+
+        g.setFont(new Font(Font.SANS_SERIF,Font.BOLD,20));
         drawStart(g2);
         drawAbout(g2);
         drawQuit(g2);
@@ -57,20 +79,32 @@ public class MenuState extends State {
     }
 
     private void drawStart(Graphics2D g){
-        g.setFont(new Font(Font.SANS_SERIF,Font.BOLD,20));
-        g.drawImage(buttonH,Framework.width/2-100,Framework.height/2-80,200,50,null);
+
+        if(counter == 0)
+            g.drawImage(buttonH,Framework.width/2-100,Framework.height/2-80,200,50,null);
+        else
+            g.drawImage(buttonN,Framework.width/2-100,Framework.height/2-80,200,50,null);
+
         g.drawString("Start Game",Framework.width/2-50,Framework.height/2-50);
     }
 
     private void drawAbout(Graphics2D g){
-        g.setFont(new Font(Font.SANS_SERIF,Font.BOLD,20));
-        g.drawImage(buttonN,Framework.width/2-100,Framework.height/2-10,200,50,null);
+
+        if(counter == 1)
+            g.drawImage(buttonH,Framework.width/2-100,Framework.height/2-10,200,50,null);
+        else
+            g.drawImage(buttonN,Framework.width/2-100,Framework.height/2-10,200,50,null);
+
         g.drawString("About",Framework.width/2-30,Framework.height/2+20);
     }
 
     private void drawQuit(Graphics2D g){
-        g.setFont(new Font(Font.SANS_SERIF,Font.BOLD,20));
-        g.drawImage(buttonN,Framework.width/2-100,Framework.height/2+60,200,50,null);
+
+        if(counter == 2)
+            g.drawImage(buttonH,Framework.width/2-100,Framework.height/2+60,200,50,null);
+        else
+            g.drawImage(buttonN,Framework.width/2-100,Framework.height/2+60,200,50,null);
+
         g.drawString("Quit",Framework.width/2-30,Framework.height/2+90);
     }
 

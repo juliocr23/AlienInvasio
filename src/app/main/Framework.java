@@ -2,10 +2,7 @@
 package app.main;
 
 import app.input.KeyboardInput;
-import app.state.GameOver;
-import app.state.GameState;
-import app.state.MenuState;
-import app.state.State;
+import app.state.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -56,6 +53,7 @@ public class Framework extends JFrame implements Runnable {
     public static State gameState;                    //The state of the game
     public static State gameOverState;
     public static State menuState;                   //The menu of the game
+    public static State aboutState;
 
 
     public void start(){
@@ -67,7 +65,8 @@ public class Framework extends JFrame implements Runnable {
         gameState = new GameState();
         menuState = new MenuState();
         gameOverState = new GameOver();
-        State.setState(menuState);
+        aboutState = new AboutState();
+        State.setState(aboutState);
 
         //Create a size window
         createSizeWindow();
@@ -292,6 +291,16 @@ public class Framework extends JFrame implements Runnable {
         System.exit( 0 );
     }
 
+    public static Graphics2D get2DGraphics(Graphics g){
+        Graphics2D g2 = (Graphics2D) g;
+
+        //Use anti-aliasing to make the text look sharper
+        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+        return g2;
+    }
+
     public static void main(String[] args) {
 
         final  Framework game = new Framework();
@@ -306,5 +315,7 @@ public class Framework extends JFrame implements Runnable {
             game.start();
         });
     }
+
+
 
 }
