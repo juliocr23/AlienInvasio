@@ -26,7 +26,7 @@ public class AboutState extends State {
         enter = false;
 
         try{
-            bg = ImageIO.read(new File("Resources/GUI/GameOverBG.png"));
+            bg = ImageIO.read(new File("Resources/GUI/bg.png"));
             buttonN = ImageIO.read(new File("Resources/GUI/buttonN.png"));
             buttonH = ImageIO.read(new File("Resources/GUI/buttonH.png"));
         }catch (Exception e){

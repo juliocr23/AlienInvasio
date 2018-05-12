@@ -6,7 +6,7 @@ import app.animation.Coin;
 import app.main.Framework;
 import app.others.DroppedItem;
 import app.others.Sound;
-import app.state.GameOver;
+import app.state.CompletedGameState;
 import app.state.State;
 
 import javax.imageio.ImageIO;
@@ -16,16 +16,18 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import static app.main.Framework.completedGameState;
+
 public class World {
 
     private static Object[][] object;                 //objects in the map
-
     private static int tileSize = 64;                 //The size of the tile
 
     private String mapTextFile;
     private String mapImageFile;
 
     private static Player player;                     //The player in the map
+    private static Alien boss;                        //The final boss in the map
 
     private static double x;                          //The x offset of the map
     private static double y;                          //The y offset of the map
@@ -35,6 +37,8 @@ public class World {
 
     private int timer = 200;                         //Timer for player to complete map
     private volatile double delta = 0;               //Delta used to calculate timer
+
+    private int enemyKilled = 0;
 
     private Image clockUI1;                          //Clock UI component for the game
     private Image clockUI2;                          //Clock UI component for the game
@@ -71,8 +75,18 @@ public class World {
             BG.reset();
         }
 
+        //Reset Map and go to gameOver state.
         if(player.getHealth() == 1){
-           State.setState(Framework.gameOverState);
+
+            player.setHealth(100);
+            timer = 200;
+            State.setState(Framework.gameOverState);
+        }
+
+        if(boss.isDead()){
+            ((CompletedGameState)Framework.completedGameState).setEnemyKilled(enemyKilled);
+            ((CompletedGameState)Framework.completedGameState).setMoneyCollected(player.getScore()/100);
+             State.setState(Framework.completedGameState);
         }
 
         updateTimer();
@@ -109,6 +123,7 @@ public class World {
                     if(alien.getHitCounter() == alien.getNumberOfHits()) {
                         alien.dontMove();
                         alien.setToDead();
+                        enemyKilled++;
                     }
 
                     bullet[c].x = -1000;
@@ -468,9 +483,9 @@ public class World {
                 }
 
                 if(tile == '3'){
-                    Alien alien = new Alien(0,0,64,100,"Resources/Enemies/predatorMask/",0.3);
-                    alien.setNumberOfHits(3);
-                    object[i][j] = alien;
+                    boss = new Alien(0,0,64,100,"Resources/Enemies/predatorMask/",0.3);
+                    boss.setNumberOfHits(3);
+                    object[i][j] = boss;
                 }
             }
         }

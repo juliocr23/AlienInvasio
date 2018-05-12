@@ -18,7 +18,7 @@ public class MenuState extends State {
 
     public MenuState(){
         try{
-            background = ImageIO.read(new File("Resources/GUI/GameOverBG.png"));
+            background = ImageIO.read(new File("Resources/GUI/bg.png"));
             buttonN = ImageIO.read(new File("Resources/GUI/buttonN.png"));
             buttonH = ImageIO.read(new File("Resources/GUI/buttonH.png"));
         }catch (Exception e){
@@ -107,8 +107,4 @@ public class MenuState extends State {
 
         g.drawString("Quit",Framework.width/2-30,Framework.height/2+90);
     }
-
-
-
-
 }

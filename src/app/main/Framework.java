@@ -54,6 +54,7 @@ public class Framework extends JFrame implements Runnable {
     public static State gameOverState;
     public static State menuState;                   //The menu of the game
     public static State aboutState;
+    public static State completedGameState;
 
 
     public void start(){
@@ -61,12 +62,19 @@ public class Framework extends JFrame implements Runnable {
         width = 640;
         height = 512;
 
-        //Create and set state
-        gameState = new GameState();
-        menuState = new MenuState();
-        gameOverState = new GameOver();
-        aboutState = new AboutState();
-        State.setState(aboutState);
+        //Create states
+        gameState          = new GameState();
+        menuState          = new MenuState();
+        gameOverState      = new GameOver();
+        aboutState         = new AboutState();
+        completedGameState = new CompletedGameState();
+
+        //Set the total enemies and total money in the map
+        ((CompletedGameState) completedGameState).setTotalEnemy(9);
+        ((CompletedGameState) completedGameState).setTotalMoney(21);
+
+        //Set state
+        State.setState(menuState);
 
         //Create a size window
         createSizeWindow();

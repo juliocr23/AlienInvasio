@@ -19,7 +19,7 @@ public class GameOver extends State {
     public GameOver(){
 
         try{
-            background = ImageIO.read(new File("Resources/GUI/GameOverBG.png"));
+            background = ImageIO.read(new File("Resources/GUI/bg.png"));
             buttonN = ImageIO.read(new File("Resources/GUI/buttonN.png"));
             buttonH = ImageIO.read(new File("Resources/GUI/buttonH.png"));
         }catch (Exception e){
@@ -39,7 +39,8 @@ public class GameOver extends State {
                 System.exit(0);
             }
             else{
-               State.setState(Framework.gameState);
+                System.out.println("Setting game state");
+                State.setState(Framework.gameState);
             }
         }
     }
@@ -97,6 +98,11 @@ public class GameOver extends State {
             g.drawImage(buttonN,(Framework.width/2)-50,Framework.height/2-25,100,50,null);
 
         g.drawString("Quit",(Framework.width/2)-20,Framework.height/2+5);
+    }
+
+    private void reset(){
+        flag = false;
+        enter = false;
     }
 
 }
